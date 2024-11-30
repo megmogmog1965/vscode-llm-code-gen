@@ -18,6 +18,10 @@ export async function callTool(toolUse: ToolUseBlockParam): Promise<MessageParam
       return (await listFiles(input.path)).join('\n')
     },
 
+    search_files: async (input: { path: string, regex: string, file_pattern: string }) => {
+      return (await searchFiles(input.path, input.regex, input.file_pattern)).join('\n')
+    },
+
     list_code_definition_names: async (input: { path: string }) => {
       return (await listCodeDefinitionNames(input.path))
     },
@@ -28,10 +32,6 @@ export async function callTool(toolUse: ToolUseBlockParam): Promise<MessageParam
 
     write_to_file: async (input: { file_path: string, content: string }) => {
       return (await writeToFile(input.file_path, input.content))
-    },
-
-    search_files: async (input: { path: string, regex: string, file_pattern: string }) => {
-      return (await searchFiles(input.path, input.regex, input.file_pattern)).join('\n')
     },
   }
 

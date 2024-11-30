@@ -104,11 +104,12 @@ async function callAnthropic(contexts: MessageParam[]): Promise<Message> {
 
       1. はじめに必ず \`<thinking>\` タグの中で、すでに持っている情報と、タスクを進めるために必要な情報を評価してください。タスクおよび提供されているツールの説明に基づき、最も適切なツールを選択してください。
       2. "list_files" ツールを使用して、ワークスペースの全てのファイルの一覧を取得します。最初の一度は必ずワークスペースのルートディレクトリを指定して下さい！
-      3. 次に "list_code_definition_names" ツールを使用して、ソースコード中の定義名（関数名、クラス名、変数名、etc...）の一覧を取得します。
-      4. コードのより詳細な内容を知りたい場合は "read_file" ツールを使用して、特定したファイルの内容を読み込みます。
-      5. 読み込んだファイルの内容をもとに、ソースコードを生成します。
-      6. 生成したソースコードをファイルに書き込むために "write_to_file" ツールを使用します。
-      7. 他にも変更の必要なファイルがある場合は、再度 2〜6 の手順を踏んで下さい。
+      3. 次に "search_files" ツールを使用して、ファイルの内容が正規表現にマッチするファイルの一覧を取得してください。
+      4. 次に "list_code_definition_names" ツールを使用して、ソースコード中の定義名（関数名、クラス名、変数名、etc...）の一覧を取得してください。
+      5. コードのより詳細な内容を知りたい場合は "read_file" ツールを使用して、特定したファイルの内容を読み込むことができます。
+      6. 読み込んだファイルの内容をもとに、ソースコードを生成してください。
+      7. 生成したソースコードをファイルに書き込むために "write_to_file" ツールを使用してください。
+      8. 他にも変更の必要なファイルがある場合は、再度 2〜7 の手順を踏んでください。
     `,
     tools: [
       {
@@ -123,6 +124,28 @@ async function callAnthropic(contexts: MessageParam[]): Promise<Message> {
             },
           },
           'required': ['path'],
+        },
+      },
+      {
+        'name': 'search_files',
+        'description': '指定したディレクトリから再帰的にソースコードファイルを読み込み、ファイルの内容が正規表現にマッチしたファイルパスの一覧を返します。',
+        'input_schema': {
+          'type': 'object',
+          'properties': {
+            'path': {
+              'type': 'string',
+              'description': `検索対象のディレクトリです。VSCode ワークスペースのルートディレクトリ "${workspacePath.fsPath}" からの相対パスで指定して下さい。`,
+            },
+            'regex': {
+              'type': 'string',
+              'description': '検索対象としたいファイル内容にマッチする正規表現を指定して下さい。 正規表現は JavaScript の正規表現形式とし、"new RegExp()" の第一引数に渡されます。',
+            },
+            'file_pattern': {
+              'type': 'string',
+              'description': '検索対象としたいファイル名のパターンを Glob パターンで指定して下さい。省略した場合は "*" とみなします。 e.g., "*.ts"',
+            },
+          },
+          'required': ['path', 'regex'],
         },
       },
       {
@@ -169,28 +192,6 @@ async function callAnthropic(contexts: MessageParam[]): Promise<Message> {
             },
           },
           'required': ['file_path', 'content'],
-        },
-      },
-      {
-        'name': 'search_files',
-        'description': '指定したディレクトリから再帰的にソースコードファイルを読み込み、ファイルの内容が正規表現にマッチしたファイルパスの一覧を返します。',
-        'input_schema': {
-          'type': 'object',
-          'properties': {
-            'path': {
-              'type': 'string',
-              'description': `検索対象のディレクトリです。VSCode ワークスペースのルートディレクトリ "${workspacePath.fsPath}" からの相対パスで指定して下さい。`,
-            },
-            'regex': {
-              'type': 'string',
-              'description': '検索対象としたいファイル内容にマッチする正規表現を指定して下さい。 正規表現は JavaScript の正規表現形式とし、"new RegExp()" の第一引数に渡されます。',
-            },
-            'file_pattern': {
-              'type': 'string',
-              'description': '検索対象としたいファイル名のパターンを Glob パターンで指定して下さい。省略した場合は "*" とみなします。 e.g., "*.ts"',
-            },
-          },
-          'required': ['path', 'regex'],
         },
       },
     ],
