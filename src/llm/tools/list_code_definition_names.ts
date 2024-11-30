@@ -7,5 +7,5 @@ import { parseCodesFrom } from './tree-sitter'
  * @returns コード定義名のリスト.
  */
 export async function listCodeDefinitionNames(dirPath: string): Promise<string> {
-	return await parseCodesFrom(dirPath)
+  return await parseCodesFrom(dirPath)
 }
