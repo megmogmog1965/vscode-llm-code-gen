@@ -121,7 +121,8 @@ async function parseFile(filePath: string, asts: AstQueries): Promise<string | u
   const captures = ast.captures(fileContent)
 
   const definitions = captures.reduce((pre, capture) => {
-    const line = capture.node.text.substring(0, capture.node.text.indexOf('\n'))
+    const posLf = capture.node.text.indexOf('\n')
+    const line = capture.node.text.substring(0, (posLf > 0) ? posLf : capture.node.text.length)
     const tag = capture.name
 
     // <{function|method|class}> tag.
